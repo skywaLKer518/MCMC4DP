@@ -9,12 +9,12 @@ public class MCMC extends MarkovChain{
 	private int cateNumber = 0; // number of category
 	private int cateIndexMax = 0;
 	
-	private int Observed = 0; // 9;//0;TODO
+	private int Observed = 0;
 	private int minN = 1;
-	private double prior[];
+//	private double prior[];
 	private double theta[]; // parameters. for each c?
 	
-	private List<Double> thetaAlive = new LinkedList<Double>(); // store all cate which is associated with at least one data sample
+//	private List<Double> thetaAlive = new LinkedList<Double>(); // store all cate which is associated with at least one data sample
 	private List<Integer> cateAlive = new LinkedList<Integer>(); // store all cate which is associated with at least one data sample
 	
 	MCMC(int stateN) {
@@ -88,12 +88,8 @@ public class MCMC extends MarkovChain{
 					accept = 1;
 				else
 					accept = ratio(dis1,dis2);
-//				if (accept > 0){
-//					System.out.println("hahahaha   "+accept );
-//				}
 				r = Math.random();
 				if (r <= accept){
-//					updateC(i,c);  // update ith categor to c, that is, state[i] -> c
 					updateCate(i,c);
 //					printDataStateTheta();
 				}
@@ -165,7 +161,6 @@ public class MCMC extends MarkovChain{
 					}while( number[minN]!=0 && minN != previous);
 				}
 			}
-			
 			for (int j = 0; j < stateNumber; j++){
 				if (state[j] == previous){
 					state[j] = c;
@@ -292,19 +287,6 @@ public class MCMC extends MarkovChain{
 	private int drawNewC() {
 		return minN;
 	}
-
-//	private void updateCate(int type,int arg0){
-//		if (type == 0){			// add a new cate, update minN; add to cateAlive
-//			while (number[minN + 1] != 0){
-//				minN ++;
-//			}
-//			minN++;
-//			cateAlive.add(arg0);
-//		}
-//		else if (type == 1){	// delete a cate
-//			minN = arg0;
-//		}
-//	}
 	
 	public void printState(){
 		for (int i = 0; i < stateNumber; i++){
@@ -325,5 +307,6 @@ public class MCMC extends MarkovChain{
 		System.out.println("Total category: "+cateNumber);
 		System.out.println("Max category index: "+cateIndexMax);
 	}
+	
 }
 
