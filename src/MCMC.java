@@ -32,7 +32,7 @@ public class MCMC extends MarkovChain{
 	}
 	
 	public void algorithm5(){
-		for (int i = 0; i < 1000; i ++){
+		for (int i = 0; i < Environment.Times; i ++){
 			step1();
 			step2();
 		}
@@ -92,11 +92,14 @@ public class MCMC extends MarkovChain{
 //					System.out.println("hahahaha   "+accept );
 //				}
 				r = Math.random();
-				if (r <= accept)
+				if (r <= accept){
 //					updateC(i,c);  // update ith categor to c, that is, state[i] -> c
-					updateCC(i,c);
+					updateCate(i,c);
+//					printDataStateTheta();
+				}
+				
 			}
-			if (Observed < 9)
+			if (Observed < Data.dataNumber)
 				Observed ++;
 		}
 	}
@@ -110,9 +113,9 @@ public class MCMC extends MarkovChain{
 	}
 	
 	// use c to update state[i] and all other state with the same state
-	private void updateCC(int i, int c){
+	private void updateCate(int i, int c){
 		int previous = state[i];
-		// case -: state[i] == 0;
+		// case 0: state[i] == 0;
 		//          change state[i] to c; if (number[c]>0), else cateNumber++ ;number[c]++; if (c > cateIndexMax) cateIndexMax = c; MinN++ until MinN not used;
 		//          if cateAlive contains c , else cateAlive add c;
 		if (previous == 0){				// state
@@ -126,10 +129,11 @@ public class MCMC extends MarkovChain{
 			}
 			if (c > cateIndexMax)			// cateIndexMax
 				cateIndexMax = c;
-			while (number[minN + 1] != 0){ // minN
-				minN ++;
+			if (number[minN]!=0){
+				do{ // minN
+					minN ++;
+				}while (number[minN]!=0);
 			}
-			minN++;
 			if (!cateAlive.contains(c)){  // cateAlive
 				cateAlive.add(c);
 			}
@@ -137,11 +141,31 @@ public class MCMC extends MarkovChain{
 		else {
 			// case 1: state i exists, so does c
 			//		    change all state with the same state[i] to be c;number[c] += number[i],number[i] = 0;cateNumber--;if (state[i] == cateIndexMax) 
-			//          cateIndexMax -- until number[cateIndexMax - 1]>0; MinN: unchanged;  if cateAlive contains state[i], remove it.
+			//          cateIndexMax -- until number[cateIndexMax - 1]>0; MinN: i < MinN then MinN = i;  if cateAlive contains state[i], remove it.
 			// case 2: state i exists, but not c  : new category
 			//			change all state with state[i] to c; number[c] = number[i],number[i] = 0;if (state[i] == cateIndexMax)cateIndexMax -- until number[cateIndexMax - 1]>0;
 			//          MinN: if i < MinN then MinN = i; if cateAlive contains state[i], remove it. cateAlive adds c;
-			if (number[c] > 0) cateNumber--;// case 1
+			
+			if (number[c] > 0) {// case 1
+				cateNumber--;
+				if (previous < minN) minN = previous;
+				if (cateIndexMax == previous){
+					do {
+						cateIndexMax--;
+					}while(number[cateIndexMax] == 0);
+				}
+			}
+			else{
+				if (previous < c){
+					minN = previous;
+				}
+				else{// previous > c. at this time c = minN for sure.
+					do { // minN
+						minN ++;
+					}while( number[minN]!=0 && minN != previous);
+				}
+			}
+			
 			for (int j = 0; j < stateNumber; j++){
 				if (state[j] == previous){
 					state[j] = c;
@@ -149,60 +173,61 @@ public class MCMC extends MarkovChain{
 			}
 			number[c] += number[previous];
 			number[previous] = 0;
-			cateNumber--;
 			if (c > cateIndexMax){  // TODO
 				cateIndexMax = c;
 			}
 			if (cateAlive.contains(previous)){
-				cateAlive.remove(previous);
+				int index = cateAlive.indexOf(previous);
+				cateAlive.remove(index);
 			}
 			if (!cateAlive.contains(c)){
 				cateAlive.add(c);
 			}
+			
 		}
 	}
 
 	// use c to update state[i]	
-	private void updateC(int i, int c) {
-		int previous = state[i];
-		if (previous > 0)
-			number[previous] --;
-		number[c] ++;
-		if ( c > cateIndexMax){
-			cateIndexMax = c;
-		}
-		state[i] = c;
-		if (number[c] == 1){  // c is a new one; that is , c use the previous minN; add c to cateAlive
-			while (number[minN + 1] != 0){
-				minN ++;
-			}
-			minN++;
-			cateAlive.add(c);
-		}
-		if (previous == 0){			// simply added c, cateNumber++
-			if (number[c] == 1){
-				cateNumber++;
-			}
-			else;
-		}
-		else{
-			if (number[previous] == 0)		// one category vanished: update cateNumber, minN
-			{
-				cateAlive.remove(previous);
-				if (previous < minN){
-					minN = previous;
-				}
-				if (number[c]== 1);
-				else
-					cateNumber--;
-			}
-			else{
-				if (number[c]== 1)
-					cateNumber++;
-				else;
-			}
-		}
-	}
+//	private void updateC(int i, int c) {
+//		int previous = state[i];
+//		if (previous > 0)
+//			number[previous] --;
+//		number[c] ++;
+//		if ( c > cateIndexMax){
+//			cateIndexMax = c;
+//		}
+//		state[i] = c;
+//		if (number[c] == 1){  // c is a new one; that is , c use the previous minN; add c to cateAlive
+//			while (number[minN + 1] != 0){
+//				minN ++;
+//			}
+//			minN++;
+//			cateAlive.add(c);
+//		}
+//		if (previous == 0){			// simply added c, cateNumber++
+//			if (number[c] == 1){
+//				cateNumber++;
+//			}
+//			else;
+//		}
+//		else{
+//			if (number[previous] == 0)		// one category vanished: update cateNumber, minN
+//			{
+//				cateAlive.remove(previous);// not correct here TODO
+//				if (previous < minN){
+//					minN = previous;
+//				}
+//				if (number[c]== 1);
+//				else
+//					cateNumber--;
+//			}
+//			else{
+//				if (number[c]== 1)
+//					cateNumber++;
+//				else;
+//			}
+//		}
+//	}
 
 
 	/*
@@ -300,16 +325,5 @@ public class MCMC extends MarkovChain{
 		System.out.println("Total category: "+cateNumber);
 		System.out.println("Max category index: "+cateIndexMax);
 	}
-	
-	// change category i to c
-	private void updateCate(int i, int c) {
-		int tmp;
-		// case 1: i exists, so does c
-		// case 2: i exists, but not c
-		// case 3: i doesn't exist, but c does
-		// case 4: i doesn't, neither does c
-//		if (number[i])
-		
-	}	
 }
 

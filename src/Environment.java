@@ -2,6 +2,7 @@ public class Environment{
 	static final double Coefficient = (1 / Math.sqrt(2 * Math.PI));  // 
 	static final int MaxStateNumber = 100;
 	static final int MaxCateNumber = 100;
+	static final int Times = 1000;
 	static final int R = 5;  // repeated times
 	static final double delta = 0.02;
 	static final double Error = 999;
