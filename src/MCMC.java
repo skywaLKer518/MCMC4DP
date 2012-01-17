@@ -34,40 +34,41 @@ public class MCMC extends MarkovChain{
 	public void algorithm5(){
 		for (int i = 0; i < Environment.Times; i ++){
 			step1();
+//			printDataStateTheta();
 			step2();
 		}
 		return;
 	}
 	
-	public void step11(){
-		Data data = new Data();
-		int c = 0;
-		double accept;
-		double r;
-		for (int i = 1; i <= cateIndexMax; i++){
-			if (number[i]<=0)
-				continue;
-			for (int j = 0; j < Environment.R; j++){
-				c = drawC();
-				if ( c == i)
-					continue;
-				if ( number[c] == 0){
-					drawTheta(c);
-				}
-				// compute the acceptance probability
-				double dis1 = Math.abs(theta[i] - data.y[i]);
-				double dis2 = Math.abs(theta[c] - data.y[i]);
-				if (dis2 < dis1)
-					accept = 1;
-				else
-					accept = ratio(dis1,dis2);
-				r = Math.random();
-				if (r < accept){
-					updateCate(i,c);
-				}
-			}
-		}
-	}
+//	public void step11(){
+//		Data data = new Data();
+//		int c = 0;
+//		double accept;
+//		double r;
+//		for (int i = 1; i <= cateIndexMax; i++){
+//			if (number[i]<=0)
+//				continue;
+//			for (int j = 0; j < Environment.R; j++){
+//				c = drawC();
+//				if ( c == i)
+//					continue;
+//				if ( number[c] == 0){
+//					drawTheta(c);
+//				}
+//				// compute the acceptance probability
+//				double dis1 = Math.abs(theta[i] - data.y[i]);
+//				double dis2 = Math.abs(theta[c] - data.y[i]);
+//				if (dis2 < dis1)
+//					accept = 1;
+//				else
+//					accept = ratio(dis1,dis2);
+//				r = Math.random();
+//				if (r < accept){
+//					updateCate(i,c);
+//				}
+//			}
+//		}
+//	}
 	
 	public void step1(){
 		Data data = new Data();
@@ -108,7 +109,8 @@ public class MCMC extends MarkovChain{
 		}
 	}
 	
-	// use c to update state[i] and all other state with the same state
+	// wrong!!: use c to update state[i] and all other state with the same state
+	// correct: use c to update state[i] with c
 	private void updateCate(int i, int c){
 		int previous = state[i];
 		// case 0: state[i] == 0;
@@ -143,35 +145,37 @@ public class MCMC extends MarkovChain{
 			//          MinN: if i < MinN then MinN = i; if cateAlive contains state[i], remove it. cateAlive adds c;
 			
 			if (number[c] > 0) {// case 1
-				cateNumber--;
-				if (previous < minN) minN = previous;
-				if (cateIndexMax == previous){
-					do {
-						cateIndexMax--;
-					}while(number[cateIndexMax] == 0);
+				if (number[previous]==1){
+					cateNumber--;
+					if (previous < minN) minN = previous;
+					if (cateIndexMax == previous){
+						do {
+							cateIndexMax--;
+						}while(number[cateIndexMax] == 0);
+					}
 				}
 			}
 			else{
-				if (previous < c){
-					minN = previous;
-				}
-				else{// previous > c. at this time c = minN for sure.
-					do { // minN
-						minN ++;
-					}while( number[minN]!=0 && minN != previous);
+				cateNumber++;
+				if (number[previous]==1){
+					cateNumber--;
+					if (previous < c){
+						minN = previous;
+					}
+					else{// previous > c. at this time c = minN for sure.
+						do { // minN
+							minN ++;
+						}while( number[minN]!=0 && minN != previous);
+					}	
 				}
 			}
-			for (int j = 0; j < stateNumber; j++){
-				if (state[j] == previous){
-					state[j] = c;
-				}
-			}
-			number[c] += number[previous];
-			number[previous] = 0;
+			state[i] = c;
+			number[c] ++;
+			number[previous] --;
 			if (c > cateIndexMax){  // TODO
 				cateIndexMax = c;
 			}
-			if (cateAlive.contains(previous)){
+			if (number[previous] == 0 && cateAlive.contains(previous)){
 				int index = cateAlive.indexOf(previous);
 				cateAlive.remove(index);
 			}

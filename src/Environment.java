@@ -2,7 +2,7 @@ public class Environment{
 	static final double Coefficient = (1 / Math.sqrt(2 * Math.PI));  
 	static final int MaxStateNumber = 100;
 	static final int MaxCateNumber = 100;
-	static final int Times = 1000;
+	static final int Times = 2000;
 	static final int R = 5;  // repeated times
 	static final double delta = 0.02;
 	static final double Error = 999;
@@ -12,9 +12,9 @@ public class Environment{
 	private static double posterior[] = new double[501];
 	static final double thetaMax = -5;
 	static final double thetaMin = -5;
-	
 	static final double Expand = 10000000000.0; // make sure the normalization factor is not too large...TODO
 	
+	static int postErrorTimes = 0;
 	Environment(){
 		// x[0] = -5, x[500] = 5;
 		x[0] = -5;
@@ -69,14 +69,14 @@ public class Environment{
 			}
 			sumtmp += posterior[i];
 		}
-		if  (sumtmp < 0.0001) { //if (sumtmp == 0){
+if (sumtmp == 0){
 			System.out.println("here print post");
 			for (int j = 0; j < size; j ++){
-				System.out.print("data["+j+"] = "+d[j]+" ");
+				System.out.print("data["+j+"] = "+d[j]+";  ");
 			}
 			System.out.println();
-			System.out.println("sumtmp: " + sumtmp);
 		}
+		
 		for (int i = 0; i < 501; i ++){
 			posterior[i] /= sumtmp;
 			postSum+= posterior[i];
@@ -94,11 +94,11 @@ public class Environment{
 			}
 		}
 		if (pos == -1){
-			System.out.println("r: "+r);
+			postErrorTimes++;
 			System.out.println("sumtmp: "+sumtmp);
-			System.out.println("postSum: "+postSum);
 			System.out.println("Error in post sampling");
-			System.exit(-1);
+//			System.exit(-1);
+			return 0;
 		}
 		double r1 = Math.random();
 		return (-5 + 0.02 * pos - 0.01 + r1 * 0.02);
