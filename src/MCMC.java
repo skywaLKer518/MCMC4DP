@@ -40,36 +40,6 @@ public class MCMC extends MarkovChain{
 		return;
 	}
 	
-//	public void step11(){
-//		Data data = new Data();
-//		int c = 0;
-//		double accept;
-//		double r;
-//		for (int i = 1; i <= cateIndexMax; i++){
-//			if (number[i]<=0)
-//				continue;
-//			for (int j = 0; j < Environment.R; j++){
-//				c = drawC();
-//				if ( c == i)
-//					continue;
-//				if ( number[c] == 0){
-//					drawTheta(c);
-//				}
-//				// compute the acceptance probability
-//				double dis1 = Math.abs(theta[i] - data.y[i]);
-//				double dis2 = Math.abs(theta[c] - data.y[i]);
-//				if (dis2 < dis1)
-//					accept = 1;
-//				else
-//					accept = ratio(dis1,dis2);
-//				r = Math.random();
-//				if (r < accept){
-//					updateCate(i,c);
-//				}
-//			}
-//		}
-//	}
-	
 	public void step1(){
 		Data data = new Data();
 		int c;
@@ -172,6 +142,9 @@ public class MCMC extends MarkovChain{
 			state[i] = c;
 			number[c] ++;
 			number[previous] --;
+			while (number[minN]!=0){
+				minN++;
+			}
 			if (c > cateIndexMax){  // TODO
 				cateIndexMax = c;
 			}
@@ -310,6 +283,7 @@ public class MCMC extends MarkovChain{
 		}
 		System.out.println("Total category: "+cateNumber);
 		System.out.println("Max category index: "+cateIndexMax);
+		System.out.println("minN: "+minN);
 	}
 	
 }

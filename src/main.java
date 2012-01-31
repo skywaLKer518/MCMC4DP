@@ -6,7 +6,7 @@ public class main{
 //		for (int i = 0; i < 10; i ++){
 //			System.out.println(c.sampleStandardNormal());
 //		}
-		MCMC m = new MCMC(9);
+		MCMC m = new MCMC(18);
 		m.algorithm5();
 		m.printDataStateTheta();
 		return;
